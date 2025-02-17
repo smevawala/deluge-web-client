@@ -8,3 +8,5 @@ class ParamArgs(TypedDict):
     seed_mode: bool
     auto_managed: bool
     download_location: Optional[str]
+    move_completed: bool
+    move_completed_path: optional[str]

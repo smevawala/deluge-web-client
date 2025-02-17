@@ -108,6 +108,7 @@ class DelugeWebClient:
         seed_mode: bool = False,
         auto_managed: bool = False,
         save_directory: Optional[str] = None,
+        move_directory: Optional[str] = None,
         label: Optional[str] = None,
         timeout: int = 30,
     ) -> Response:
@@ -128,15 +129,20 @@ class DelugeWebClient:
             Response: Response object.
         """
         torrent_path = Path(torrent_path)
-        with open(torrent_path, "rb") as tf:
+        with open(torrent_path, "rb") as tf:            
             args = ParamArgs(
                 add_paused=add_paused,
                 seed_mode=seed_mode,
                 auto_managed=auto_managed,
                 download_location=None,
+                move_completed=False,
+                move_completed_path=None,
             )
             if save_directory:
                 args["download_location"] = str(save_directory)
+            if move_directory:
+                args["move_completed"] =True
+                args["move_completed_path"] = str(move_directory)
             params = [
                 str(torrent_path),
                 str(base64.b64encode(tf.read()), encoding="utf-8"),
@@ -153,6 +159,7 @@ class DelugeWebClient:
         self,
         torrents: Iterable[Union[PathLike[str], str, Path]],
         save_directory: Optional[str] = None,
+        move_directory: Optional[str] = None,
         label: Optional[str] = None,
         timeout: int = 30,
     ) -> dict[str, Response]:
@@ -175,6 +182,7 @@ class DelugeWebClient:
                 response = self.upload_torrent(
                     torrent_path,
                     save_directory=save_directory,
+                    move_directory=move_directory,
                     label=label,
                     timeout=timeout,
                 )
@@ -193,6 +201,7 @@ class DelugeWebClient:
         seed_mode: bool = False,
         auto_managed: bool = False,
         save_directory: Optional[str] = None,
+        move_directory: Optional[str] = None,
         label: Optional[str] = None,
         timeout: int = 30,
     ):
@@ -216,9 +225,14 @@ class DelugeWebClient:
             seed_mode=seed_mode,
             auto_managed=auto_managed,
             download_location=None,
+            move_completed=False,
+            move_completed_path=None,
         )
         if save_directory:
             args["download_location"] = str(save_directory)
+        if move_directory:
+                args["move_completed"] =True
+                args["move_completed_path"] = str(move_directory)
         payload = {
             "method": "core.add_torrent_magnet",
             "params": [str(uri), args],
@@ -233,6 +247,7 @@ class DelugeWebClient:
         seed_mode: bool = False,
         auto_managed: bool = False,
         save_directory: Optional[str] = None,
+        move_directory: Optional[str] = None,
         label: Optional[str] = None,
         timeout: int = 30,
     ):
@@ -255,9 +270,14 @@ class DelugeWebClient:
             seed_mode=seed_mode,
             auto_managed=auto_managed,
             download_location=None,
+            move_completed=False,
+            move_completed_path=None,
         )
         if save_directory:
             args["download_location"] = str(save_directory)
+        if move_directory:
+                args["move_completed"] =True
+                args["move_completed_path"] = str(move_directory)
         payload = {
             "method": "core.add_torrent_url",
             "params": [str(url), args],
